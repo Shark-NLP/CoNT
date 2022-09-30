@@ -1,10 +1,9 @@
 # CoNT
-This is the [transformers-based](https://github.com/huggingface/transformers.git) implementation 
- for NeurIPS 2022  paper: *[CoNT: Contrastive Neural Text Generation](https://arxiv.org/abs/2205.14690)* 
- 
+This is the [transformers-based](https://github.com/huggingface/transformers.git) implementation for NeurIPS 2022  paper: *[CoNT: Contrastive Neural Text Generation](https://arxiv.org/abs/2205.14690)* 
+CoNT is a Strong contrastive learning framework for neural text generation which outperforms the MLE based training method on five generation tasks. 
+
 For machine translation task please refer to our fairseq code.
 
-CoNT is a Strong contrastive learning framework for neural text generation which outperforms the MLE based training method on five generation tasks. 
 ## Dependencies
 - Python 3.7
 - [PyTorch](https://github.com/pytorch/pytorch) 1.7 +
