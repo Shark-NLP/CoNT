@@ -7,9 +7,9 @@ For machine translation task please refer to our fairseq code.
 ## Dependencies
 - Python 3.7
 - [PyTorch](https://github.com/pytorch/pytorch) 1.7 +
-- [transformers](https://github.com/huggingface/transformers) 4.20 + (for abstractive verison)
+- [transformers](https://github.com/huggingface/transformers) 4.20 +
 
 	
 All code only supports running on Linux.
-
-### we are active on opening source code and the full instruction of running our code will be available before 5th Oct
+------
+#### we are active on opening source code and the full instruction of running our code will be available before 5th Oct
