@@ -20,7 +20,7 @@ class CoNTGenerator(nn.Module):
                 print("random initialize...")
                 self.generator = T5ForConditionalGeneration(self.generator.config)
         else:
-            raise NotImplementedError("not support this PTM yet")
+            raise NotImplementedError("do not support this PTM yet")
         self.pad_id = pad_id
         self.hidden_size = self.generator.config.hidden_size
         self.vocab_size = self.generator.config.vocab_size
