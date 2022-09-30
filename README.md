@@ -7,10 +7,6 @@ For machine translation task please refer to our fairseq code.
 ## Dependencies
 - Python 3.7
 - [PyTorch](https://github.com/pytorch/pytorch) 1.7 +
-- [pyrouge](https://github.com/bheinzerling/pyrouge) 0.1.3
-	- You should install pyrouge package first to reproduce our results. Instruction for installing pyrouge can be found in this [repo](https://github.com/ChenxinAn-fdu/CGSum)
-- [rouge](https://github.com/pltrdy/rouge) 1.0.0
-	- Used in  the validation phase.
 - [transformers](https://github.com/huggingface/transformers) 4.20 + (for abstractive verison)
 
 	
