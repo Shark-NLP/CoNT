@@ -12,4 +12,4 @@ For machine translation task please refer to our fairseq code.
 All code only supports running on Linux.
 
 ------
-#### We are active on opening source code and the full instruction of running our code will be available before **5th Oct**
+#### We are active on opening source code and the full instruction of running our code will be available before **12th Oct**
