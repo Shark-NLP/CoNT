@@ -9,7 +9,7 @@ Main libraries
 - Python 3.7
 - [PyTorch](https://github.com/pytorch/pytorch) 1.7 +
 - [transformers](https://github.com/huggingface/transformers) 4.21.0
-- [fastNLP](https://github.com/) 1.0.0beta
+- [fastNLP](https://github.com/fastnlp/fastNLP) 1.0.0beta
 ```
 pip install -r requirements.txt
 ```
