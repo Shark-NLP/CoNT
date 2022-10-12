@@ -22,7 +22,7 @@ All code only supports running on Linux.
 we have prepared the raw dataset to help you reproduce the results in our paper.  Datasets provided by this repo can  **only**  be used for *Reproduction* and *Research Purposes*.
 All files are in `jsonl` format where each line is a `json` sample:
 ```
-{"source": "the input text (for encoder)", "target": "the target text (for decoder)"}}
+{"source": "the input text (for encoder)", "target": "the target text (for decoder)"}
 ```
 You can Download the jsonl files through these links.
 1. Summarization：
