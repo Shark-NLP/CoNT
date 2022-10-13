@@ -93,6 +93,11 @@ python evaluation/xsum.py --sys_file results/xsum/t5/2022-10-05-10-37-24-196200/
 ### Details about evaluation scripts and preprocess
 Comming soon
 
+
+*We are pleased to answer any questions about this paper or codes* ^_^
+email: `cxan20@fudan.edu.cn` 
+WeChat: `cxan996`
+
 ### Citing
 ```
 @article{an2022cont,
