@@ -95,7 +95,8 @@ Comming soon
 
 -----
 **We are pleased to answer any questions about this paper or codes** ^_^
-email: `cxan20@fudan.edu.cn` 
+
+e-mail: `cxan20@fudan.edu.cn` 
   WeChat: `cxan996`
 
 ### Citing
