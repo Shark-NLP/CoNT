@@ -1,7 +1,7 @@
 # CoNT
 This is the [transformers-based](https://github.com/huggingface/transformers.git) implementation 
  for NeurIPS 2022  paper: *[CoNT: Contrastive Neural Text Generation](https://arxiv.org/abs/2205.14690)*.
- For machine translation task please refer to our [fairseq code]().
+ For machine translation task please refer to our [fairseq code](https://github.com/ChenxinAn-fdu/CoNT).
 
 CoNT is a Strong contrastive learning framework for neural text generation which outperforms the MLE based training method on **five** generation tasks, including *machine translation*, *summarization*, *code comment generation*, *data-to-text generation*, *commensense generation*. 
 ## Dependencies
@@ -31,7 +31,7 @@ You can Download the jsonl files through these links.
     - [Multi-News](https://drive.google.com/file/d/16VdfzvLmmOrYsayujA-Hu4d3i_ejHTln/view?usp=sharing)
 2. Translation：
     - [WMT'16 Ro-En](https://drive.google.com/file/d/1rGoylmZvIhNvsoPZda7OZP_0nYUfUpoq/view?usp=sharing)
-    - WMT'14 En-De and IWSLT'14 De-En (fairseq folder)
+    - [WMT'14 En-De and IWSLT'14 De-En](https://github.com/ChenxinAn-fdu/CoNT)
 3. Code comment Generation
     - [java](https://drive.google.com/file/d/1PBdxKvMTvfCzseactMRffTUwuTI7oAGz/view?usp=sharing)
     - [python](https://drive.google.com/file/d/189xlRW3r3UuMTko73zURfJ3I_LXQ026D/view?usp=sharing)
