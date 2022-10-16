@@ -11,18 +11,19 @@ Main libraries
 - [transformers](https://github.com/huggingface/transformers) 4.21.0
 - [fastNLP](https://github.com/fastnlp/fastNLP) 1.0.0beta
 ```
-pip install -r requirements.txt
+pip install transformers == 4.21.0
+pip install fastNLP == 1.0.0beta
 ```
 
 	
 All code only supports running on Linux.
 
 
-### Data
+### data
 we have prepared the raw dataset to help you reproduce the results in our paper.  Datasets provided by this repo can  **only**  be used for *Reproduction* and *Research Purposes*.
 All files are in `jsonl` format where each line is a `json` sample:
 ```
-{"source": "the input text (for encoder)", "target": "the target text (for decoder)"}
+{"source": "the input text (for encoder)", "target": "the target text (for decoder)"}}
 ```
 You can Download the jsonl files through these links.
 1. Summarization：
@@ -91,13 +92,31 @@ python evaluation/xsum.py --sys_file results/xsum/t5/2022-10-05-10-37-24-196200/
 ```
 
 ### Details about evaluation scripts and preprocess
-Comming soon
+
+- Summarization：[pyrouge library](https://github.com/bheinzerling/pyrouge) which is the most widely-used library to evaluate summarization systems. Instructions for Installation can be found in this [repo](https://github.com/ChenxinAn-fdu/CGSum)
+- WMT16_Ro-En: we follow the evaluation scripts of [previous work CLAPS](https://github.com/seanie12/CLAPS)
+- Java and Python: the evaluation codes are taken from [CodeT5](https://github.com/salesforce/CodeT5).
+- WikiBio: we use evaluation scripts provided by this work.  We preprocess the dataset following the instruction in this [repo](https://github.com/tyliupku/wiki2bio).
+Example:
+```
+{"source": "caption[jens in 1962], name[salome jens], birth date[8 may 1935], birth place[milwaukee , wisconsin , u.s.], occupation[actress], years active[1956 -- present], article title[salome jens]", 
+"target": "salome jens -lrb- born may 8 , 1935 -rrb- is an american stage , film and television actress ."}
+```
+- ToTTo: the evaluation codes are taken from their [official repo](https://github.com/google-research-datasets/ToTTo). We preprocess the dataset following the instruction in this [repo]().
+Example: 
+```
+{"source": "<page_title> List of Speakers of the Minnesota House of Representatives </page_title> <section_title> State </section_title> <table> <cell> Ralph J. Parker <col_header> Speaker </col_header> </cell> </table>",
+ "target": "Ralph J. Parker was a Minnesota politician and a Speaker of the Minnesota House of Representatives. Ralph J. Parker was a Speaker of the Minnesota House of Representatives. Ralph J. Parke, was a Minnesota politician, and a Speaker of the Minnesota House of Representatives."}
+```
+To get the results on the test set please submit your results [here](https://docs.google.com/forms/d/e/1FAIpQLScjGJr9z6_DljrYN8ySi1-zdHk8DL4udEmBHU6IsfoLvuDBZA/viewform?usp=send_form).
+- CommonGen: we only evaluate ROUGE score on dev set and we get the reported results in our paper with the help of the [authors of CommonGen](https://inklab.usc.edu/CommonGen/).
+
+**Thanks for their work.**.
 
 -----
-**We are pleased to answer any questions about this paper or codes** ^_^
+We are pleased to answer any questions about this paper or codes ^_^
 
-e-mail: `cxan20@fudan.edu.cn` 
-  WeChat: `cxan996`
+e-mail: cxan20@fudan.edu.cn WeChat: cxan996 
 
 ### Citing
 ```

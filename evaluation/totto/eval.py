@@ -29,11 +29,10 @@ def eval_function(sys_path):
     with open(write_file, "w") as f:
         for pred in predictions:
             print(pred, file=f)
-    sh_totto = f"bash language/totto/totto_eval.sh --prediction_path {write_file} --target_path jsonl_files/totto_data/totto_dev_data.jsonl"
+    sh_totto = f"bash evaluation/totto/language/totto/totto_eval.sh --prediction_path {write_file} --target_path jsonl_files/totto_meta/totto_dev_data.jsonl"
     print(sh_totto)
     os.system(sh_totto)
-    # bleu = corpus_bleu(golds, predictions)
-    # print("bleu: ", bleu)
+
 
 
 def build_tgt_dict(insts):

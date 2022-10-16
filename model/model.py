@@ -8,10 +8,10 @@ from fastNLP import seq_len_to_mask
 
 
 class CoNTGenerator(nn.Module):
+
     def __init__(self, PTM, model_name, pad_id, args):
         super(CoNTGenerator, self).__init__()
         self.PTM = PTM
-
         if self.PTM == "pegasus":
             self.generator = PegasusForConditionalGeneration.from_pretrained(model_name)
         elif self.PTM == "t5" or "codet5":
@@ -20,18 +20,17 @@ class CoNTGenerator(nn.Module):
                 print("random initialize...")
                 self.generator = T5ForConditionalGeneration(self.generator.config)
         else:
-            raise NotImplementedError("do not support this PTM yet")
+            raise NotImplementedError("not support this PTM yet")
         self.pad_id = pad_id
         self.hidden_size = self.generator.config.hidden_size
         self.vocab_size = self.generator.config.vocab_size
         self.linear_layer = nn.Linear(self.hidden_size, self.hidden_size)
         nn.init.xavier_uniform_(self.linear_layer.weight)
-        self.ignore_index = -100
+        self.ignore_index = args.ignore_index
         self.loss_fct = CrossEntropyLoss(ignore_index=self.ignore_index)
         self.args = args
 
-
-    def form_ngram(self, input_tensor, n=4):
+    def form_ngram(self, input_tensor, n=2):
         """
         input_tensor: batch x sample_num x seq_len
         return: batch x seq_len-3 x 4
@@ -69,7 +68,6 @@ class CoNTGenerator(nn.Module):
         sim_matrix = torch.sum(torch.max(sim_matrix, dim=-1).values, dim=-1)
         length = sys_lengths + ref_lengths.unsqueeze(1)
         return sim_matrix / length  # batch x sample_num
-
 
     def affine_transformation(self, input_features, padding_mask, axis=1):
         length = torch.sum(padding_mask, axis=1) - 1
@@ -116,7 +114,7 @@ class CoNTGenerator(nn.Module):
         for i in range(1, n):
             pos_score = cos_distance[:, :-i]
             neg_score = cos_distance[:, i:]
-            same_mask = (torch.abs(bleu_distance[:, :-i] - bleu_distance[:, i:]) > 0.005).float()
+            same_mask = (torch.abs(bleu_distance[:, :-i] - bleu_distance[:, i:]) > 0.001).float()
             ones = torch.ones(pos_score.size(), device=cos_distance.device)
             loss_func = torch.nn.MarginRankingLoss(margin * i, reduction='none')  # batch x i
             marginal_loss = loss_func(pos_score, neg_score, ones)
@@ -177,14 +175,15 @@ class CoNTGenerator(nn.Module):
         dummy = max_indices.repeat(1, 1, cand_ids.size(2))
         return torch.gather(cand_ids, 1, dummy).squeeze(1)  # batch x seq_len
 
-    def predict(self, src_inp, target_inp, target_outp):
-        if self.args.warmup:
-            return self.forward(src_inp, target_inp, target_outp)
-        src_pad_mask = ~(src_inp == self.pad_id)
+    def evaluate_step(self, src_inp, target_inp, target_outp):
+        src_pad_mask = (src_inp != self.pad_id)
         args = copy.deepcopy(self.args)
+        if self.args.warmup:
+            args.alpha = 0.0
+        else:
+            args.alpha = self.args.alpha
         args.diversity_pen = 0.0
         args.beam_size = 8
-        args.alpha = 1.0
         args.early_stop = True
         candidate_ids = self.generate(src_inp, src_pad_mask, args)
         return {"score": self.torch_bleu(target_inp, candidate_ids.unsqueeze(1), 2).mean()}
@@ -193,18 +192,16 @@ class CoNTGenerator(nn.Module):
         """
         cos_score distance of hypothesis to source
         """
-
         encoder = self.generator.get_encoder()
         decoder = self.generator.get_decoder()
 
         batch_size = src_inp.size(0)
-        target_outp = target_outp.masked_fill(target_outp == self.pad_id, self.ignore_index)
         src_pad_mask = ~(src_inp == self.pad_id)
 
         encoder_hidden_states = encoder(src_inp, src_pad_mask)['last_hidden_state']
         tgt_pad_mask = ~(target_inp == self.pad_id)
-        if self.args.PTM != "codet5":
-            tgt_pad_mask[:, 0] = 1
+        tgt_pad_mask[:, 0] = 1
+
         decoder_out = decoder(input_ids=target_inp, attention_mask=tgt_pad_mask,
                               encoder_hidden_states=encoder_hidden_states,
                               encoder_attention_mask=src_pad_mask)  # last layer
@@ -246,13 +243,13 @@ class CoNTGenerator(nn.Module):
         dummy = sampled_indices.unsqueeze(-1).repeat(1, 1, samples_all.size(2))
         sampled_input = torch.gather(samples_all, 1, dummy)  # batch x sample_num x seq_len
 
-        # print("sampled_bleu_distance sort", torch.sort(sampled_bleu_distance, dim=-1, descending=True).values)
         decoder_hidden_states = []
         for sample_idx in range(sampled_indices.size(-1)):
             sampled_input_dec = sampled_input[:, sample_idx, :]
+
             sample_pad_mask = ~(sampled_input_dec == self.pad_id)
-            if self.args.PTM != "codet5":
-                sample_pad_mask[:, 0] = 1
+            sample_pad_mask[:, 0] = 1
+
             decoder_out = decoder(input_ids=sampled_input_dec, attention_mask=sample_pad_mask,
                                   encoder_hidden_states=encoder_hidden_states,
                                   encoder_attention_mask=src_pad_mask)  # last layer

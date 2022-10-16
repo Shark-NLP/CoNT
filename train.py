@@ -2,27 +2,17 @@ import glob
 import sys
 
 import torch
-from transformers import AutoTokenizer
 
 sys.path.append('../')
 import argparse
-import os
-from os.path import exists
-from model.dataloader import Seq2SeqPipe
-from model.model import  CoNTGenerator
-from model.metrics import Loss
+
+from model.dataloader import get_data_bundle
+from model.model import CoNTGenerator
 from model.callback import MLECallback, CoNTCallback
-from fastNLP import DistTrainer, get_local_rank
-import torch.distributed as dist
+from fastNLP import Trainer
+from fastNLP import prepare_dataloader
 from model.optimizer import Adafactor
-from model.metrics import MLEValidMetric, CoNTValidMetric
-
-
-def get_data_path(PTM, dataset):
-    paths = {}
-    paths['train'] = f'tokenized_files/{dataset}/train.{PTM}.jsonl'
-    paths['val'] = f'tokenized_files/{dataset}/val.{PTM}.jsonl'
-    return paths
+from model.metrics import CoNTValidMetric
 
 
 def str2bool(v):
@@ -34,55 +24,17 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def configure_training(args):
-    devices = [int(gpu) for gpu in args.gpus.split(',')]
-    params = {}
-    params['beam_size'] = args.beam_size
-    params['batch_size'] = args.batch_size
-    params['accum_count'] = args.accum_count
-    params['margin'] = args.margin
-    params['n_epochs'] = args.n_epochs
-    params['validate_every'] = args.validate_every
-    return devices, params
-
-
 def train_model(args):
-    # initialize
-    dist.init_process_group(backend="nccl")
-    if get_local_rank() != 0:
-        dist.barrier()
-    # load the datasets
-    data_paths = get_data_path(args.PTM, args.dataset)
-    if args.PTM == "codet5":
-        tokenize_name = "Salesforce/codet5-base"
-    elif args.PTM == "t5":
-        tokenize_name = "t5-small"
-    elif args.PTM == "pegasus":
-        tokenize_name = "google/pegasus-xsum"
-    else:
-        raise NotImplementedError("please add this pretrained model ")
-    tokenizer = AutoTokenizer.from_pretrained(tokenize_name)
-    args.pad_id = tokenizer.pad_token_id
-    args.eos_id = tokenizer.eos_token_id
-    args.bos_id = tokenizer.bos_token_id
-    model = CoNTGenerator(args.PTM, args.model_name, args.pad_id, args)
-
     if args.warmup:
         print("=" * 10, " Warmup with MLE ...", "=" * 10)
-        callbacks_master = [MLECallback(args)]
-        valid_metric = MLEValidMetric()
+        callbacks = [MLECallback(args, metric="torch_ngram#ngram-overlap")]
     else:
-        print("=" * 10, "training contrastive-based model...", "=" * 10)
-        callbacks_master = [CoNTCallback(args)]
-        valid_metric = CoNTValidMetric()
-    for name in data_paths:
-        assert exists(data_paths[name])
-    if not exists(args.save_path):
-        os.makedirs(args.save_path)
-    if get_local_rank() == 0:
-        dist.barrier()
+        print("=" * 10, "Contrastive learning based training...", "=" * 10)
+        callbacks = [CoNTCallback(args, metric="torch_ngram#ngram-overlap", topk=3)]
 
-    devices, train_params = configure_training(args)
+    valid_metric = CoNTValidMetric()
+    data_bundle = get_data_bundle(args)
+    model = CoNTGenerator(args.PTM, args.model_name, args.pad_id, args)
     optimizer = Adafactor(
         model.parameters(),
         lr=args.lr,
@@ -95,20 +47,19 @@ def train_model(args):
         optimizer.load_state_dict(optim_pt)
         print("=" * 20, "load optimizer from", args.model_name + ".optm")
 
-    criterion = Loss()
-    datasets = Seq2SeqPipe(args).process_from_file(data_paths)
-    print(f'Information of {args.dataset}:', datasets)
-    train_set = datasets.datasets['train']
-    dev_set = datasets.datasets['val']
-    trainer = DistTrainer(train_data=train_set, model=model, optimizer=optimizer,
-                          loss=criterion, batch_size_per_gpu=args.batch_size,
-                          update_every=args.accum_count, n_epochs=args.n_epochs, dev_data=dev_set,
-                          print_every=10, validate_every=args.validate_every, metrics=valid_metric,
-                          callbacks_master=callbacks_master)
+    dls = prepare_dataloader(data_bundle, batch_size=args.batch_size)
+    for dl in dls.values():
+        dl.set_pad('src_inp', pad_val=args.pad_id)
+        dl.set_pad('target_inp', pad_val=args.pad_id)
+        dl.set_pad('target_outp', pad_val=args.ignore_index)
+    devices = list(map(int, args.gpus.split(",")))
+    trainer = Trainer(model=model, train_dataloader=dls['train'], optimizers=optimizer,
+                      accumulation_steps=args.accum_count,
+                      evaluate_dataloaders=dls['val'], metrics={"ngram-overlap": valid_metric}, device=devices,
+                      driver="torch", n_epochs=args.n_epochs, callbacks=callbacks, fp16=False, evaluate_every=max(1,args.validate_every),
+                      torch_kwargs={'ddp_kwargs': {'find_unused_parameters': True}})
 
-    print('Start training with the following hyper-parameters:')
-    print(train_params)
-    trainer.train()
+    trainer.run()
 
 
 if __name__ == '__main__':
@@ -124,9 +75,7 @@ if __name__ == '__main__':
                         help='the training batch size', type=int)
     parser.add_argument('--accum_count', default=1,
                         help='number of updates steps to accumulate before performing a backward/update pass', type=int)
-    parser.add_argument('--lr', default=None, type=float)
-    parser.add_argument('--margin', default=0.01,
-                        help='parameter for MarginRankingLoss', type=float)
+    parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--n_epochs', default=50,
                         help='total number of training epochs', type=int)
     parser.add_argument('--validate_every', default=2000,
@@ -155,6 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('--pad_id', type=int)
     parser.add_argument('--eos_id', type=int)
     parser.add_argument('--bos_id', default=None, type=int)
-
+    parser.add_argument('--ignore_index', default=-100, type=int)
     args = parser.parse_known_args()[0]
+
     train_model(args)
