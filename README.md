@@ -111,7 +111,7 @@ Example:
 To get the results on the test set please submit your results [here](https://docs.google.com/forms/d/e/1FAIpQLScjGJr9z6_DljrYN8ySi1-zdHk8DL4udEmBHU6IsfoLvuDBZA/viewform?usp=send_form).
 - CommonGen: we only evaluate ROUGE score on dev set and we get the reported results in our paper with the help of the [authors of CommonGen](https://inklab.usc.edu/CommonGen/).
 
-**Thanks for their work.**.
+**Thanks for their work**.
 
 -----
 We are pleased to answer any questions about this paper or codes ^_^
