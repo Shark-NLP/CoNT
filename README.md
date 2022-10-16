@@ -114,9 +114,9 @@ To get the results on the test set please submit your results [here](https://doc
 **Thanks for their work**.
 
 -----
-We are pleased to answer any questions about this paper or codes ^_^
+We are pleased to answer any questions about this paper or codes ! ^_^
 
-e-mail: cxan20@fudan.edu.cn WeChat: cxan996 
+e-mail: `cxan20@fudan.edu.cn`
 
 ### Citing
 ```
