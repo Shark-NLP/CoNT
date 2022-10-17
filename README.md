@@ -4,6 +4,11 @@ This is the [transformers-based](https://github.com/huggingface/transformers.git
  For machine translation tasks please refer to our [fairseq code](https://github.com/ChenxinAn-fdu/CoNT).
 
 CoNT is a Strong contrastive learning framework for neural text generation which outperforms the MLE based training method on **five** generation tasks, including *machine translation*, *summarization*, *code comment generation*, *data-to-text generation*, *commensense generation*. 
+
+We are pleased to answer any questions about this paper or codes !
+
+e-mail: `cxan20@fudan.edu.cn`
+-----
 ## Dependencies
 Main libraries
 - Python 3.7
@@ -112,11 +117,6 @@ To get the results on the test set please submit your results [here](https://doc
 - CommonGen: we only evaluate ROUGE score on dev set and we get the reported results in our paper with the help of the [authors of CommonGen](https://inklab.usc.edu/CommonGen/).
 
 **Thanks for their work**.
-
------
-We are pleased to answer any questions about this paper or codes !
-
-e-mail: `cxan20@fudan.edu.cn`
 
 ### Citing
 ```
