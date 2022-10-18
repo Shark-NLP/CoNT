@@ -60,7 +60,8 @@ This command will produce the tokenized files of XSum `tokenized_files/train.t5.
 ### Training
 We have provided the training script for each dataset we used in this paper, and you can easily start the training process with them:
 
-```#If there is no warmed-up checkpoint, you should use `--warmup True` to train the generation model with NLLLoss 
+```
+#If there is no warmed-up checkpoint, you should use `--warmup True` to train the generation model with NLLLoss 
 python run_xsum.py --mode train --gpus 0,1,2,3 --warmup True --model_name t5-small (or google/pegasus-large)
 ```
 
