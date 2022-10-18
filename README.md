@@ -89,7 +89,9 @@ python run_xsum.py --mode test --model_name t5-small --save_path checkpoints/xsu
 This will produce the generated results in the floder `results/xsum/t5/2022-10-05-10-37-24-196200/`  containing `epoch-2_step-8000.test.sys` , `epoch-2_step-8000.test.ref`
 
 ### Evaluation
-This is an example to evaluate all the generated results in this folder:
+We have proveded the evaluation scripts for each datasets: `evaluation/$dataset/eval.py` with which you can easily get the evaluation results.
+
+This is an example to evaluate all the generated results for `xsum` in the folder `results/xsum/t5/2022-10-05-10-37-24-196200/`:
 ```
 python evaluation/xsum/eval.py --sys_path results/xsum/t5/2022-10-05-10-37-24-196200/
 ```
