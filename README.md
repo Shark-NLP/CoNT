@@ -58,9 +58,9 @@ python preprocess/preprocess.py --model_name  t5-small --dataset xsum
 This command will produce the tokenized files of XSum `tokenized_files/train.t5.jsonl, tokenized_files/val.t5.jsonl` with the tokenizer of t5-small  
 
 ### Training
-We have provided the training script for each datasets, and you can easily start the training process with them:
-```#If you do not have a warmed-up checkpoint, you should use --warmup True to train the generation model with NLLLoss 
-python run_xsum.py --mode train --gpus 0,1,2,3 --warmup True --model_name t5-small (or google/pegasus-large, google/pegasus-xsum)
+We have provided the training script for each dataset we used in this paper, and you can easily start the training process with them:
+```#If there is no warmed-up checkpoint, you should use `--warmup True` to train the generation model with NLLLoss 
+python run_xsum.py --mode train --gpus 0,1,2,3 --warmup True --model_name t5-small (or google/pegasus-large)
 ```
 the warmed-up checkpoint will be saved to `./pretrained_weigths/xsum/t5(or pegasus)` by default.  
 Please notice that huggingface also provides many finetuned checkpoints. So that if the `--model_name`  contains the dataset name  (like `google/pegasus-xsum`), we will skip the warmup.
@@ -76,7 +76,7 @@ We suggest first selecting the best checkpoint based on the dev set with `--mode
 
 You can run the following command to generate the results on test/dev set with all checkpoints in a given folder `checkpoints/xsum/t5/2022-10-05-10-37-24-196200/`:
 ```
-python run_xsum.py --mode test/val --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ --gpus 0,1,2,3
+python run_xsum.py --mode val (or test) --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ --gpus 0,1,2,3
 ```
 This will produce the generated results in the floder: `results/xsum/t5/2022-10-05-10-37-24-196200/` containing serval system output and ground truth files: `epoch-2_step-8000.val.sys` , `epoch-2_step-8000.val.ref`, `epoch-2_step-10000.val.sys` , `epoch-2_step-10000.val.ref`
 
