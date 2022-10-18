@@ -72,29 +72,30 @@ python run_xsum.py --mode train --gpus 0,1,2,3 --warmup False
 After completing the training process, several best checkpoints are stored in a folder named after the training start time, for example, `./checkpoints/xsum/t5/2022-10-05-10-37-24-196200`
 
 ### Generation
-You can run the following command to generate the results on test/validation set with all checkpoints in a given folder:
+You can run the following command to generate the results on test/dev set with all checkpoints in a given folder:
 You can first select the best checkpoint on dev set with `--mode val` and then generate the results on the test set  with that checkpoint. 
 
 ```
 python run_xsum.py --mode test/val --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ --gpus 0,1,2,3,4,5,6,7
 ```
-This will produce the generated results in: `results/xsum/t5/2022-10-05-10-37-24-196200/` -- `epoch-2_step-8000.val.sys` , `epoch-2_step-8000.val.ref`, `epoch-2_step-10000.val.sys` , `epoch-2_step-10000.val.ref`
+This will produce the generated results in the floder: `results/xsum/t5/2022-10-05-10-37-24-196200/` containing serval system output and ground truth files: `epoch-2_step-8000.val.sys` , `epoch-2_step-8000.val.ref`, `epoch-2_step-10000.val.sys` , `epoch-2_step-10000.val.ref`
 
 
-To generate the results for test set with  **a specified checkpoint**  using the `--ckpt ` parameter and change the mode to `test`:
+To generate the results for test set with  **a specified checkpoint**, you can use the `--ckpt ` parameter and change the mode to `test`:
 ```
-python run_xsum.py --mode test --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ --ckpt epoch-2_step-8000.pt --gpus 0,1,2,3,4,5,6,7
+python run_xsum.py --mode test --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ \
+--ckpt epoch-2_step-8000.pt --gpus 0,1,2,3,4,5,6,7
 ```
-This will produce the generated results in: `results/xsum/t5/2022-10-05-10-37-24-196200/` -- `epoch-2_step-8000.test.sys` , `epoch-2_step-8000.test.ref`
+This will produce the generated results in the floder `results/xsum/t5/2022-10-05-10-37-24-196200/`  containing `epoch-2_step-8000.test.sys` , `epoch-2_step-8000.test.ref`
 
 ### Evaluation
 This is an example to evaluate all the generated results in this folder:
 ```
-python evaluation/xsum.py --sys_path results/xsum/t5/2022-10-05-10-37-24-196200/
+python evaluation/xsum/eval.py --sys_path results/xsum/t5/2022-10-05-10-37-24-196200/
 ```
 If you only want to evaluate a specified file：
 ```
-python evaluation/xsum.py --sys_file results/xsum/t5/2022-10-05-10-37-24-196200/epoch-2_step-8000.sys
+python evaluation/xsum/eval.py --sys_file results/xsum/t5/2022-10-05-10-37-24-196200/epoch-2_step-8000.sys
 ```
 
 ### Details about evaluation scripts and preprocess
