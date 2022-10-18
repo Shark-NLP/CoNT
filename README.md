@@ -58,7 +58,7 @@ python preprocess/preprocess.py --model_name  t5-small --dataset xsum
 This command will produce the tokenized files of XSum `tokenized_files/train.t5.jsonl, tokenized_files/val.t5.jsonl` with the tokenizer of t5-small  
 
 ### Training
-We have provided the training script for each dataset we used in this paper, and you can easily start the training process with them:
+We have provided the training scripts for each dataset we used in this paper, and you can easily start the training process with them:
 
 ```
 #If there is no warmed-up checkpoint, you should use `--warmup True` to train the generation model with NLLLoss 
@@ -93,7 +93,7 @@ python run_xsum.py --mode test --model_name t5-small --save_path checkpoints/xsu
 This will produce the generated results in the floder `results/xsum/t5/2022-10-05-10-37-24-196200/`  containing `epoch-2_step-8000.test.sys` , `epoch-2_step-8000.test.ref`
 
 ### Evaluation
-We have proveded the evaluation scripts for each datasets: `evaluation/$dataset/eval.py` with which you can easily get the evaluation results.
+We have proveded the evaluation scripts for each dataset: `evaluation/$dataset/eval.py` with which you can easily get the evaluation results.
 
 This is an example to evaluate all the generated results for `xsum` in the folder `results/xsum/t5/2022-10-05-10-37-24-196200/`:
 ```
@@ -115,7 +115,7 @@ Example:
 {"source": "caption[jens in 1962], name[salome jens], birth date[8 may 1935], birth place[milwaukee , wisconsin , u.s.], occupation[actress], years active[1956 -- present], article title[salome jens]", 
 "target": "salome jens -lrb- born may 8 , 1935 -rrb- is an american stage , film and television actress ."}
 ```
-- ToTTo: the evaluation codes are taken from their [official repo](https://github.com/google-research-datasets/ToTTo). We preprocess the dataset following the instruction in this [repo]().
+- ToTTo: the evaluation codes are taken from their [official repo](https://github.com/google-research-datasets/ToTTo). We preprocess the dataset following the instruction in this [repo](https://github.com/google-research/language/tree/master/language/totto).
 Example: 
 ```
 {"source": "<page_title> List of Speakers of the Minnesota House of Representatives </page_title> <section_title> State </section_title> <table> <cell> Ralph J. Parker <col_header> Speaker </col_header> </cell> </table>",
