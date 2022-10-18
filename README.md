@@ -73,19 +73,19 @@ Please notice that huggingface also provides many finetuned checkpoints. So that
 python run_xsum.py --mode train --gpus 0,1,2,3 --warmup False
 ```
 
-After completing the training process, several best checkpoints are stored in a folder named after the training start time, for example, `./checkpoints/xsum/t5/2022-10-05-10-37-24-196200`
+After completing the training process,  several best checkpoints will be stored in a folder named after the training start time by default, for example, `checkpoints/xsum/t5/2022-10-05-10-37-24-196200`
 
 ### Generation
-We suggest first selecting the best checkpoint based on the dev set with `--mode val` and then generate the results on the test set with the best checkpoint. 
+We suggest first selecting the best checkpoint based on the dev set with `--mode val` and then generating the results on the test set with the best checkpoint. 
 
-You can run the following command to generate the results on test/dev set with all checkpoints in a given folder `checkpoints/xsum/t5/2022-10-05-10-37-24-196200/`:
+You can run the following command to generate the results on test/dev set with all checkpoints in a given folder, e.g., `checkpoints/xsum/t5/2022-10-05-10-37-24-196200/`:
 ```
 python run_xsum.py --mode val (or test) --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ --gpus 0,1,2,3
 ```
 This will produce the generated results in the floder: `results/xsum/t5/2022-10-05-10-37-24-196200/` containing serval system output and ground truth files: `epoch-2_step-8000.val.sys` , `epoch-2_step-8000.val.ref`, `epoch-2_step-10000.val.sys` , `epoch-2_step-10000.val.ref`
 
 
-To generate the results for test set with  **a specified checkpoint**, you can use the `--ckpt ` parameter and change the mode to `test`:
+To generate the results for test set with  **a specified checkpoint**, you can use the `--ckpt`  parameter and remember to change the mode to `test`:
 ```
 python run_xsum.py --mode test --model_name t5-small --save_path checkpoints/xsum/t5/2022-10-05-10-37-24-196200/ \
 --ckpt epoch-2_step-8000.pt --gpus 0,1,2,3
