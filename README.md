@@ -1,4 +1,4 @@
-# <img src="logo.jpeg" width="8%" alt="" align=center /> &emsp;  CoNT: Contrastive Neural Text Generation
+# <img src="logo.jpeg" width="10%" alt="" align=center />  CoNT: Contrastive Neural Text Generation
 This is the [transformers-based](https://github.com/huggingface/transformers.git) implementation 
  for NeurIPS 2022  paper: *[CoNT: Contrastive Neural Text Generation](https://arxiv.org/pdf/2205.14690v2.pdf)*.
  For machine translation tasks please refer to our [fairseq code](https://github.com/ChenxinAn-fdu/CoNT).
