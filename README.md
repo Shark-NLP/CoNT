@@ -28,7 +28,7 @@ pip install fastNLP == 1.0.0beta
 All code only supports running on Linux.
 
 
-### data
+### Datasets
 we have prepared the raw dataset to help you reproduce the results in our paper.  Datasets provided by this repo can  **only**  be used for *Reproduction* and *Research Purposes*.
 All files are in `jsonl` format where each line is a `json` sample:
 ```
