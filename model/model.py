@@ -46,8 +46,7 @@ class CoNTGenerator(nn.Module):
 
     def torch_bleu(self, ref_tensor, sys_tensor, pad_id, n_gram=2):
         """
-        Calculates n-gram precision with brevity penalty.
-
+        Calculates n-gram precision with brevity penalty. contributed by jinulee-v
         ref_tensor: batch x seq_len1
         sys_tensor: batch x sample_num x seq_len2
         """
