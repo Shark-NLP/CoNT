@@ -44,30 +44,54 @@ class CoNTGenerator(nn.Module):
         ret_tensor = torch.masked_select(input_tensor_repeated, help_matrix.to(input_tensor.device))
         return ret_tensor.view(bsz, cand_num, seq_len_clip, n)
 
-    def torch_bleu(self, ref_tensor, sys_tensor, n_gram=2):
+    def torch_bleu(self, ref_tensor, sys_tensor, pad_id, n_gram=2):
         """
+        Calculates n-gram precision with brevity penalty.
+
         ref_tensor: batch x seq_len1
         sys_tensor: batch x sample_num x seq_len2
         """
-        sys_padding = (~(sys_tensor == self.pad_id)).float()
-        ref_padding = (~(ref_tensor == self.pad_id)).float()
-        n = min(min(n_gram, ref_tensor.size(-1)), sys_tensor.size(-1))
-        ref_lengths = torch.sum(ref_padding, dim=-1) - n + 1
-        ref_ones = torch.ones_like(ref_lengths, device=ref_lengths.device)
-        ref_lengths = torch.where(ref_lengths > 0, ref_lengths, ref_ones)
-        sys_lengths = torch.sum(sys_padding, dim=-1) - n + 1
-        sys_ones = torch.ones_like(sys_lengths, device=sys_lengths.device)
-        sys_lengths = torch.where(sys_lengths > 0, sys_lengths, sys_ones)
-        ref_tensor = ref_tensor * ref_padding
+        # Determine batch size, sample count(=beam size), n-gram
         bsz, sample_num = sys_tensor.size(0), sys_tensor.size(1)
-        ref_tensor = ref_tensor[:, None, :].repeat(1, sample_num, 1)
-        input_tensor1_4gram = self.form_ngram(ref_tensor, n).float()
-        input_tensor2_4gram = self.form_ngram(sys_tensor, n).float()  # batch x sample_num x seq_len-3 x 4
-        sim_matrix = torch.cosine_similarity(input_tensor2_4gram.unsqueeze(3), input_tensor1_4gram.unsqueeze(2),
-                                             dim=-1) >= 1.0
+        n = min(min(n_gram, ref_tensor.size(-1)), sys_tensor.size(-1))
+
+        # Generate masks
+        ref_padding = (~(ref_tensor == pad_id)).float()
+        ref_ngram_mask = torch.arange(0, ref_padding.size(1), device=ref_padding.device) * torch.ones_like(ref_padding)
+        ref_ngram_mask = torch.where(
+            ref_ngram_mask < (torch.sum(ref_padding, dim=-1, keepdims=True) - n + 1),
+            ref_padding, torch.zeros_like(ref_padding)
+        )[:, :ref_ngram_mask.size(-1) - n + 1]
+        sys_padding = (~(sys_tensor == pad_id)).float()
+        sys_ngram_mask = torch.arange(0, sys_padding.size(-1), device=sys_padding.device) * torch.ones_like(sys_padding)
+        sys_ngram_mask = torch.where(
+            sys_ngram_mask < (torch.sum(sys_padding, dim=-1, keepdims=True) - n + 1),
+            sys_padding, torch.zeros_like(sys_padding)
+        )[:, :, :sys_ngram_mask.size(-1) - n + 1]
+
+        # Get n-grams
+        ref_tensor = ref_tensor * ref_padding  # mask out paddings
+        sys_tensor = sys_tensor * sys_padding
+        ref_tensor = ref_tensor[:, None, :].repeat(1, sample_num, 1)  # readjust ref size to match sys
+        input_tensor1_ngram = self.form_ngram(ref_tensor, n).float()
+        input_tensor2_ngram = self.form_ngram(sys_tensor, n).float()  # batch x sample_num x seq_len-(n-1) x n
+
+        # Calculate similarity matrix
+        sim_matrix = (torch.norm(  # Calculate L2 norm to find if N-gram in `sys`` is present in `ref``
+            input_tensor2_ngram.unsqueeze(3) - input_tensor1_ngram.unsqueeze(2),
+            p=2, dim=-1
+        ) == 0.0).to(torch.float)
+        # print(sim_matrix.size(), sys_ngram_mask.size(), ref_ngram_mask.size())
+        sim_matrix *= sys_ngram_mask.unsqueeze(3) * ref_ngram_mask.unsqueeze(1).unsqueeze(2)
         sim_matrix = torch.sum(torch.max(sim_matrix, dim=-1).values, dim=-1)
-        length = sys_lengths + ref_lengths.unsqueeze(1)
-        return sim_matrix / length  # batch x sample_num
+
+        # Brevity penalty
+        ref_len = torch.sum(ref_padding, dim=-1, keepdims=True)
+        sys_len = torch.sum(sys_padding, dim=-1)
+        bp = torch.exp(1 - (ref_len / sys_len))
+        bp = torch.where(ref_len >= sys_len, bp, torch.ones_like(bp))
+
+        return sim_matrix / torch.sum(sys_ngram_mask, dim=-1) * bp  # batch x sample_num
 
     def affine_transformation(self, input_features, padding_mask, axis=1):
         length = torch.sum(padding_mask, axis=1) - 1
@@ -114,7 +138,7 @@ class CoNTGenerator(nn.Module):
         for i in range(1, n):
             pos_score = cos_distance[:, :-i]
             neg_score = cos_distance[:, i:]
-            same_mask = (torch.abs(bleu_distance[:, :-i] - bleu_distance[:, i:]) > 0.001).float()
+            same_mask = (torch.abs(bleu_distance[:, :-i] - bleu_distance[:, i:]) > margin).float()
             ones = torch.ones(pos_score.size(), device=cos_distance.device)
             loss_func = torch.nn.MarginRankingLoss(margin * i, reduction='none')  # batch x i
             marginal_loss = loss_func(pos_score, neg_score, ones)
@@ -227,7 +251,7 @@ class CoNTGenerator(nn.Module):
             samples_from_batch = samples_from_batch[:, :, :cand_len]
         samples_all = torch.cat([cand_ids, samples_from_batch], dim=1)  # batch x total_sample_num x seq_len
         actual_distance = self.torch_bleu(target_inp, samples_all, self.args.n_gram)  # batch x total_sample_num
-        distance_mask = (actual_distance < 0.48)  # use to mask the gold
+        distance_mask = (actual_distance < 0.99)  # use to mask the gold
         actual_distance_masked = actual_distance * distance_mask.float()
         sample_num = min(self.args.max_sample_num - 1, actual_distance_masked.size(1) - 1)
         actual_distance, actual_indices = torch.sort(actual_distance_masked, dim=-1, descending=True)
