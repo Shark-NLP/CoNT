@@ -5,12 +5,14 @@ This is the [transformers-based](https://github.com/huggingface/transformers.git
 
 CoNT is a strong contrastive learning framework for neural text generation which outperforms the MLE based training method on **five** generation tasks, including *machine translation*, *summarization*, *code comment generation*, *data-to-text generation*, *commensense generation*. 
 
+We are pleased to answer any questions about this paper or codes~  e-mail: `cxan20@fudan.edu.cn` 
+
+--------------------------------  **Updates** -----------------------------------
 
 **Updates 27/10/22**: We have uploaded our fairseq code to produce machine translation results!
 
 **Updates 25/01/23**: Fix bug for `torch_ngram` function. This code is contributed by @[jinulee-v](https://github.com/jinulee-v). Thanks for his effort!
 
-We are pleased to answer any questions about this paper or codes~  e-mail: `cxan20@fudan.edu.cn` 
 
 
 -----
