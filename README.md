@@ -9,9 +9,12 @@ We are pleased to answer any questions about this paper or codes~  e-mail: `cxan
 
 --------------------------------  **Updates** -----------------------------------
 
+**Updates 26/02/23**: Fix bugs and add an instruction for reproducing our results on ToTTo.
+
+**Updates 25/01/23**: Fix bugs for `torch_ngram` function. This code is contributed by @[jinulee-v](https://github.com/jinulee-v). Thanks for his effort!
+
 **Updates 27/10/22**: We have uploaded our fairseq code to produce machine translation results!
 
-**Updates 25/01/23**: Fix bug for `torch_ngram` function. This code is contributed by @[jinulee-v](https://github.com/jinulee-v). Thanks for his effort!
 
 
 
@@ -24,8 +27,8 @@ Main libraries
 - [transformers](https://github.com/huggingface/transformers) 4.21.0
 - [fastNLP](https://github.com/fastnlp/fastNLP) 1.0.0beta
 ```
-pip install transformers == 4.21.0
-pip install fastNLP == 1.0.0beta
+pip install transformers==4.21.0
+pip install fastNLP==1.0.0beta
 ```
 
 	
@@ -111,6 +114,26 @@ If you only want to evaluate a specified file：
 ```
 python evaluation/xsum/eval.py --sys_file results/xsum/t5/2022-10-05-10-37-24-196200/epoch-2_step-8000.sys
 ```
+
+### Another Example: ToTTo
+The first step is downing `totto_meta.zip` via [this link](https://drive.google.com/file/d/1nOlhGKpTWPCmAwmEI_gdALkAXlMn2Tbk/view?usp=sharing) and moving the unziped files to `jsonl_files`. 
+```
+# preprocess
+python preprocess/preprocess.py --model_name  t5-base --dataset totto_meta
+
+# training with warm-up
+python run_totto.py --mode train --gpus 0,1,2,3 --warmup True --model_name t5-base  
+
+# generation
+python run_totto.py --mode val --model_name t5-base --save_path checkpoints/totto_meta/t5/training_time/ --gpus 0,1,2,3
+
+# evaluation
+pip install absl-py (if you do not have the `absl` library)
+python evaluation/totto/eval.py --sys_path results/totto_meta/t5/training_time/
+```
+Results of CoNT-T5-base on *DEV set* of ToTTo are usually `BLEU=48.8~49.2` and `PARENT=58.2~58.7`.  Results of T5-base are `BLEU=47.7` and `PARENT=57.1`. Performance of other scales of T5 can be found in this [paper](https://arxiv.org/pdf/2005.10433.pdf).   
+
+
 
 ### Details about evaluation scripts and preprocess
 
