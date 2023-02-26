@@ -46,7 +46,7 @@ if __name__ == '__main__':
     inference_param = f" --alpha 0.5  --max_length 400 --min_length 200 --length_pen 2.0  "
     if args.mode != "train":
         test_cmd = f"python inference.py --gpus {args.gpus} --dataset {DATASET} " \
-                   f" --baseline {args.baseline} --batch_size {args.batch_size} --model_name {args.model_name} " \
+                   f" --batch_size {args.batch_size} --model_name {args.model_name} " \
                    f" --max_src_len 1024  --PTM {ptm} --save_path {args.save_path} " \
                    f" --diversity_pen 0.0 --beam_size 8 inference_param {inference_param} "
         run(test_cmd)

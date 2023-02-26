@@ -140,7 +140,7 @@ if __name__ == '__main__':
     print(f"you are using the {args.PTM} tokenizer to tokenize {test_file}....")
 
     if args.PTM == "t5":
-        tokenizer = T5Tokenizer.from_pretrained("t5-small", local_files_only=True)
+        tokenizer = T5Tokenizer.from_pretrained("t5-small")
     elif args.PTM == "codet5":
         tokenizer = AutoTokenizer.from_pretrained("Salesforce/codet5-base")
     elif args.PTM == "pegasus":

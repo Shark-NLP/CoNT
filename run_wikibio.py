@@ -12,7 +12,6 @@ def run(inp_cmd):
     os.system(inp_cmd)
 
 
-# script to run test, val, train of wikibio dataset example: python run_sh.py  --mode train --baseline False
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=["train", "test", "val"])

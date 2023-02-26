@@ -250,7 +250,7 @@ class CoNTGenerator(nn.Module):
         else:
             samples_from_batch = samples_from_batch[:, :, :cand_len]
         samples_all = torch.cat([cand_ids, samples_from_batch], dim=1)  # batch x total_sample_num x seq_len
-        actual_distance = self.torch_bleu(target_inp, samples_all, self.args.n_gram)  # batch x total_sample_num
+        actual_distance = self.torch_bleu(target_inp, samples_all, self.pad_id, self.args.n_gram)  # batch x total_sample_num
         distance_mask = (actual_distance < 0.99)  # use to mask the gold
         actual_distance_masked = actual_distance * distance_mask.float()
         sample_num = min(self.args.max_sample_num - 1, actual_distance_masked.size(1) - 1)

@@ -43,7 +43,7 @@ if __name__ == '__main__':
     inference_param = " --alpha 0.2  --min_length 0 --max_length 128 --length_pen 0.6 "
 
     if args.mode != "train":
-        test_cmd = f"python inference.py --gpus {args.gpu}  --dataset {args.dataset} " \
+        test_cmd = f"python inference.py --gpus {args.gpus}  --dataset {args.dataset} " \
                    f" --warmup True --mode {args.mode} --batch_size {args.batch_size} " \
                    f" --model_name {args.model_name}  --save_path {args.save_path}  --PTM {ptm} " \
                    f" --diversity_pen 0.0 --beam_size 8  {inference_param} "

@@ -36,26 +36,26 @@ if __name__ == '__main__':
         args.warmup = False
         base_model_cont = args.model_name
 
-    inference_param = " --min_length 10 --length_pen 2.0  --max_length 70 "
+    inference_param = " --alpha 0.5  --length_pen 2.0 --min_length 10 --max_length 70 "
 
     if args.mode != "train":
         test_cmd = f"python inference.py --gpus {args.gpus} --dataset {DATASET} " \
-                   f" --baseline True --mode {args.mode} --batch_size {args.batch_size}" \
+                   f" --mode {args.mode} --batch_size {args.batch_size}" \
                    f" --model_name {args.model_name} --save_path {args.save_path} --PTM {ptm} " \
                    f" --diversity_pen 0.0 --beam_size 12  {inference_param} "
         run(test_cmd)
     else:
         num_process = len(args.gpus.split(','))
         # distributed
-        train_cmd = f"python train.py  --max_src_len 512 --max_tgt_len 128 --mode train {args.gpus} " \
-                    f" --lr 1e-3 --batch_size {args.batch_size}  --accum_count {args.accum_count} " \
+        train_cmd = f"python train.py  --max_src_len 512 --max_tgt_len 128 --mode train --gpus {args.gpus} " \
+                    f"  --batch_size {args.batch_size}  --accum_count {args.accum_count} " \
                     f" --dataset {DATASET} --PTM {ptm} --model_name {args.model_name} " \
                     f" --diversity_pen 2.0 --beam_size 12 {inference_param} "
         if args.warmup:
-            train_cmd += f" --warmup True --batch_size {args.warmup_batch_size} --n_epochs 20 --validate_every {args.validate_every} " \
+            train_cmd += f" --lr 1e-3 --warmup True --batch_size {args.warmup_batch_size} --n_epochs 20 --validate_every {args.validate_every} " \
                          f" --save_path {WARM_UP_PATH + ptm}  "
             run(train_cmd)
-        train_cmd += f" --warmup False --batch_size {args.batch_size} --lr 2e-5 --n_epochs 10 " \
+        train_cmd += f" --warmup False --batch_size {args.batch_size} --lr 1e-4 --n_epochs 10 " \
                      f" --validate_every {args.validate_every // 4}  --reset_optimizer True --model_name {base_model_cont} " \
                      f" --save_path checkpoints/{DATASET}/{ptm} "
         run(train_cmd)

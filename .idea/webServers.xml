@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="bf54d3f6-35e5-4897-8385-ec67f2d05f0e" name="183">
+        <fileTransfer rootFolder="/Default/10.140.0.183" accessType="SFTP" host="jump.pjlab.org.cn" port="22" sshConfigId="00db27a4-1101-495b-ae77-a2a6b7865606" sshConfig="anchenxin@jump.pjlab.org.cn:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
