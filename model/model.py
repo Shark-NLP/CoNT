@@ -14,7 +14,7 @@ class CoNTGenerator(nn.Module):
         self.PTM = PTM
         if self.PTM == "pegasus":
             self.generator = PegasusForConditionalGeneration.from_pretrained(model_name)
-        elif self.PTM == "t5" or "codet5":
+        elif self.PTM == "t5" or self.PTM == "codet5":
             self.generator = T5ForConditionalGeneration.from_pretrained(model_name)
             if args.scratch:
                 print("random initialize...")
