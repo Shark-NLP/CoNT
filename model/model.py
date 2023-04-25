@@ -210,7 +210,7 @@ class CoNTGenerator(nn.Module):
         args.beam_size = 8
         args.early_stop = True
         candidate_ids = self.generate(src_inp, src_pad_mask, args)
-        return {"score": self.torch_bleu(target_inp, candidate_ids.unsqueeze(1), 2).mean()}
+        return {"score": self.torch_bleu(target_inp, candidate_ids.unsqueeze(1), self.pad_id, 2).mean()}
 
     def forward(self, src_inp, target_inp, target_outp):
         """
