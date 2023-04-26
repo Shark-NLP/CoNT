@@ -57,12 +57,14 @@ class CoNTGenerator(nn.Module):
 
         # Generate masks
         ref_padding = (~(ref_tensor == pad_id)).float()
+        ref_padding[:, 0] = 1
         ref_ngram_mask = torch.arange(0, ref_padding.size(1), device=ref_padding.device) * torch.ones_like(ref_padding)
         ref_ngram_mask = torch.where(
             ref_ngram_mask < (torch.sum(ref_padding, dim=-1, keepdims=True) - n + 1),
             ref_padding, torch.zeros_like(ref_padding)
         )[:, :ref_ngram_mask.size(-1) - n + 1]
         sys_padding = (~(sys_tensor == pad_id)).float()
+        sys_padding[:, 0] = 1
         sys_ngram_mask = torch.arange(0, sys_padding.size(-1), device=sys_padding.device) * torch.ones_like(sys_padding)
         sys_ngram_mask = torch.where(
             sys_ngram_mask < (torch.sum(sys_padding, dim=-1, keepdims=True) - n + 1),
