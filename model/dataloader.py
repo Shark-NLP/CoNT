@@ -1,8 +1,9 @@
 from fastNLP.io import JsonLoader
 from transformers import AutoTokenizer
+from preprocess.preprocess import TOKENIED_FILE_DIR
 
-def get_data_path(PTM, dataset):
-    paths = {'train': f'tokenized_files/{dataset}/train.{PTM}.jsonl', 'val': f'tokenized_files/{dataset}/val.{PTM}.jsonl'}
+def get_data_path(PTM, dataset):   
+    paths = {'train': f'{TOKENIED_FILE_DIR}/{dataset}/train.{PTM}.jsonl', 'val': f'{TOKENIED_FILE_DIR}/{dataset}/val.{PTM}.jsonl'}
     return paths
 
 
